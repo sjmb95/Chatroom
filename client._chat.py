@@ -3,6 +3,7 @@ import errno
 import select
 import sys
 
+# socket configuration
 ip = "127.0.0.1"
 port = 1234
 header_length = 10
@@ -20,6 +21,7 @@ client_socket.send(username_header + username)
 
 while True :
     message = input(f"{my_username} > ")
+    # encode the message and send it
     if message:
         message = message.encode("utf-8")
         message_header = f"{len(message):<{header_length}}".encode("utf-8")
@@ -28,15 +30,21 @@ while True :
 
     try:
         while True:
+
             username_header = client_socket.recv(header_length)
             if not len(username_header):
                 print("connection has been closed")
                 sys.exit()
 
+            # getting the length of username within the header
             username_length = int(username_header.decode("utf-8").strip())
+            # getting the username
             username = client_socket.recv(username_length).decode("utf-8")
+
             message_header = client_socket.recv(header_length)
+            # getting length of message within message header
             message_length = int(message_header.decode("utf-8").strip())
+
             message = client_socket.recv(message_length).decode("utf-8")
 
             print(f"{username} > {message}")
